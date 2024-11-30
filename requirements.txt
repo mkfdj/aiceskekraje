@@ -3,3 +3,4 @@ Flask-Cors==5.0.0
 gunicorn==23.0.0
 requests==2.32.0
 g4f==0.3.8.0
+jsonify==0.5
