@@ -6,10 +6,10 @@
       "use": "@vercel/python"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "chat_server.py"
+      "source": "/(.*)",
+      "destination": "/chat_server.py"
     }
   ],
   "headers": [
