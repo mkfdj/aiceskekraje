@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, session
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from g4f.client import Client
 import uuid
@@ -6,7 +6,6 @@ import time
 
 # Flask app setup
 app = Flask(__name__, static_url_path='', static_folder='static')
-app.secret_key = "your_secret_key"  # Required for session handling
 CORS(app)  # Enable CORS for development/testing
 
 # Initialize g4f client
@@ -41,18 +40,15 @@ def trim_history_for_tokens(history, max_tokens):
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
-        # Ensure the user has a unique session ID
-        if 'user_id' not in session:
-            session['user_id'] = str(uuid.uuid4())
-
-        user_id = session['user_id']
+        # Extract the user-provided unique code
+        user_code = request.json.get('user_code')
         user_message = request.json.get('message')
 
-        if not user_message:
-            return jsonify({"error": "Please send a valid message."}), 400
+        if not user_code or not user_message:
+            return jsonify({"error": "Missing user_code or message."}), 400
 
         # Retrieve or initialize user's chat history
-        history = user_histories.setdefault(user_id, [])
+        history = user_histories.setdefault(user_code, [])
         history.append({"role": "user", "content": user_message})
 
         # Prepend expert context to the history
@@ -75,22 +71,20 @@ def chat():
             history.append({"role": "assistant", "content": bot_message})  # Save bot response
             return jsonify({"response": bot_message}), 200
         else:
-            # Simulate a retry mechanism after 5 seconds
-            time.sleep(0)
-            return jsonify({"error": "Timeout. Please try again."}), 408
+            return jsonify({"error": "No response from assistant. Please try again."}), 408
 
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"error": "Internal server error."}), 500
 
-@app.route('/history', methods=['GET'])
+@app.route('/history', methods=['POST'])
 def get_history():
     """Fetch the user's chat history."""
-    if 'user_id' not in session:
-        return jsonify({"error": "No history available."}), 400
+    user_code = request.json.get('user_code')
+    if not user_code:
+        return jsonify({"error": "Missing user_code."}), 400
 
-    user_id = session['user_id']
-    history = user_histories.get(user_id, [])
+    history = user_histories.get(user_code, [])
     return jsonify({"history": history}), 200
 
 @app.route('/<path:path>')
