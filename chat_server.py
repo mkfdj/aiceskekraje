@@ -4,7 +4,7 @@ from g4f.client import Client
 import uuid
 import time
 
-# Flask app setup
+# Flask app setup3
 app = Flask(__name__, static_url_path='', static_folder='static')
 CORS(app)  # Enable CORS for development/testing
 
