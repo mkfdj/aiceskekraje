@@ -62,9 +62,8 @@ def chat():
 
         # Send request to g4f with user's history
         response = client.chat.completions.create(
-            model="gpt-4o",
+            model="claude-3.5-sonnet",
             messages=history
-            tempature=0.9
         )
 
         if hasattr(response, 'choices') and len(response.choices) > 0:
