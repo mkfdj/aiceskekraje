@@ -62,7 +62,7 @@ def chat():
 
         # Send request to g4f with user's history
         response = client.chat.completions.create(
-            model="claude-3.5-sonnet",
+            model="gpt4-mini",
             messages=history
         )
 
